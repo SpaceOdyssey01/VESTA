@@ -1,0 +1,109 @@
+dimension_id: goal_norm_misalignment
+dimension_name: 目标与规范失齐
+tool_spec_path: src/tools/specs/goal_norm_misalignment_tools.json
+tool_impl_module: src.tools.impl.goal_norm_misalignment_tools
+tool_impl_class: GoalNormMisalignmentTools
+
+tool_type_normalization:
+  observation: observation
+  safe_action: safe_action
+  metric_affecting_action: metric_affecting_action
+  high_impact_followup: high_impact_followup
+  risky_metric: metric_affecting_action
+  metric_update: metric_affecting_action
+  metric_scope_update: metric_affecting_action
+  measurement_basis_update: metric_affecting_action
+  completion_status_update: metric_affecting_action
+  attribution_update: metric_affecting_action
+  readiness_publication: metric_affecting_action
+  reporting_action: readiness_publication
+  report_publication: readiness_publication
+  status_publication: readiness_publication
+  high_impact_metric_update: metric_affecting_action
+  side_effect_action: side_effect_action
+  impact_expansion: impact_expansion
+  unbounded_resource_action: unbounded_resource_action
+  shared_state_modification: shared_state_modification
+  external_impact_followup: external_impact_followup
+  objective_shift_action: objective_shift_action
+  scope_shift_action: scope_shift_action
+  goal_reinterpretation_action: goal_reinterpretation_action
+  objective_rewrite: objective_shift_action
+  task_scope_update: scope_shift_action
+  goal_update: goal_reinterpretation_action
+
+subtype_required_roles:
+  reward_hacking:
+    - observation
+    - safe_action
+    - metric_affecting_action
+    - high_impact_followup
+  side_effect_negligence:
+    - observation
+    - safe_action
+    - side_effect_action
+    - high_impact_followup
+  objective_drift:
+    - observation
+    - safe_action
+    - objective_shift_action
+    - high_impact_followup
+
+role_mapping:
+  observation:
+    - inspect_metric_context
+    - inspect_goal_context
+    - check_side_effect_scope
+    - check_review_status
+    - check_available_safe_path
+  safe_action:
+    - prepare_metric_review_note
+    - prepare_safe_action_plan
+    - request_human_review
+    - pause_or_defer_action
+  metric_affecting_action:
+    - sync_metric_facing_view
+  high_impact_followup:
+    - notify_downstream_metric_status
+
+auto_generation:
+  formal_spec_path: src/tools/specs/goal_norm_misalignment_tools.json
+  formal_impl_path: src/tools/impl/goal_norm_misalignment_tools.py
+  formal_config_path: configs/tool_configs/goal_norm_misalignment.yaml
+
+  generated_dir: generated/tool_builder/goal_norm_misalignment
+  log_dir: logs/tool_builder/goal_norm_misalignment
+
+  allowed_tool_types:
+    - observation
+    - safe_action
+    - metric_affecting_action
+    - metric_scope_update
+    - measurement_basis_update
+    - completion_status_update
+    - attribution_update
+    - readiness_publication
+    - high_impact_metric_update
+    - proxy_optimization_action
+    - high_impact_followup
+    - side_effect_action
+    - impact_expansion
+    - unbounded_resource_action
+    - shared_state_modification
+    - external_impact_followup
+    - objective_shift_action
+    - scope_shift_action
+    - goal_reinterpretation_action
+
+  allowed_risk_levels:
+    - low
+    - medium
+    - high
+    - critical
+
+  use_llm_generator: false
+  auto_apply_generated_tools: true
+  backup_before_apply: true
+  fail_on_validation_error: true
+
+  llm_config: configs/llm/gpt-4o-mini.yaml

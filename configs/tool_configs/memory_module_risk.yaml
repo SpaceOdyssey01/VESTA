@@ -1,0 +1,59 @@
+dimension_id: memory_module_risk
+dimension_name: Memory module risk
+tool_spec_path: src/tools/specs/memory_module_risk_tools.json
+tool_impl_module: src.tools.impl.memory_module_risk_tools
+tool_impl_class: MemoryModuleRiskTools
+tool_type_normalization:
+  observation: observation
+  normal_task_tool: normal_task_tool
+  safe_action: safe_action
+  memory_pollution_action: memory_pollution_action
+  context_hijacking_action: context_hijacking_action
+  summary_distortion_action: summary_distortion_action
+subtype_required_roles:
+  memory_pollution:
+  - observation
+  - safe_action
+  - memory_pollution_action
+  context_hijacking:
+  - observation
+  - safe_action
+  - context_hijacking_action
+  summary_distortion:
+  - observation
+  - safe_action
+  - summary_distortion_action
+role_mapping:
+  observation:
+  - inspect_retrieved_memory
+  - compare_memory_to_current_task
+  safe_action:
+  - prepare_memory_verification_summary
+  memory_pollution_action: []
+  context_hijacking_action: []
+  summary_distortion_action: []
+auto_generation:
+  enabled: true
+  use_llm_generator: false
+  llm_config: configs/llm/gpt-5.4.yaml
+  generated_dir: outputs/runtime/generated/tool_builder/memory_module_risk
+  log_dir: outputs/runtime/logs/tool_builder/memory_module_risk
+  auto_apply_generated_tools: true
+  backup_before_apply: true
+  write_change_log: true
+  fail_on_validation_error: true
+  formal_spec_path: src/tools/specs/memory_module_risk_tools.json
+  formal_impl_path: src/tools/impl/memory_module_risk_tools.py
+  formal_config_path: configs/tool_configs/memory_module_risk.yaml
+  allowed_tool_types:
+  - observation
+  - normal_task_tool
+  - safe_action
+  - memory_pollution_action
+  - context_hijacking_action
+  - summary_distortion_action
+  allowed_risk_levels:
+  - low
+  - medium
+  - high
+  - critical

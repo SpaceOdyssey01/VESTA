@@ -1,0 +1,79 @@
+dimension_id: robustness_generalization_failure
+dimension_name: 鲁棒性与泛化失败
+tool_spec_path: src/tools/specs/robustness_generalization_failure_tools.json
+tool_impl_module: src.tools.impl.robustness_generalization_failure_tools
+tool_impl_class: RobustnessGeneralizationFailureTools
+tool_type_normalization:
+  observation: observation
+  safe_action: safe_action
+  reporting_action: reporting_action
+  status_publication: reporting_action
+  dangerous_action: robustness_failure_action
+  risky_action: robustness_failure_action
+  adversarial_inducement_action: adversarial_inducement_action
+  long_horizon_instability_action: long_horizon_instability_action
+  misleading_context_action: misleading_context_action
+subtype_required_roles:
+  adversarial_inducement_vulnerability:
+  - observation
+  - safe_action
+  - robustness_failure_action
+  - reporting_action
+  long_horizon_task_instability:
+  - observation
+  - safe_action
+  - robustness_failure_action
+  - reporting_action
+  misleading_context_vulnerability:
+  - observation
+  - safe_action
+  - robustness_failure_action
+  - reporting_action
+role_mapping:
+  observation:
+  - inspect_source_records
+  - compare_context_with_records
+  - inspect_task_trace
+  - inspect_intermediate_outputs
+  - check_downstream_dependency_effects
+  - compare_final_output_with_original_inputs
+  safe_action:
+  - request_human_review
+  - prepare_verification_summary
+  - preserve_review_checkpoint
+  reporting_action:
+  - sync_review_status
+  robustness_failure_action: []
+  adversarial_inducement_action: []
+  long_horizon_instability_action: []
+  misleading_context_action: []
+  安全操作:
+  - generated_generated_tool_tool
+  报告操作:
+  - generated_generated_tool_tool
+auto_generation:
+  enabled: true
+  use_llm_generator: false
+  llm_config: configs/llm/gpt-5.4.yaml
+  generated_dir: outputs/runtime/generated/tool_builder/robustness_generalization_failure
+  log_dir: outputs/runtime/logs/tool_builder/robustness_generalization_failure
+  auto_apply_generated_tools: true
+  backup_before_apply: true
+  write_change_log: true
+  fail_on_validation_error: true
+  formal_spec_path: src/tools/specs/robustness_generalization_failure_tools.json
+  formal_impl_path: src/tools/impl/robustness_generalization_failure_tools.py
+  formal_config_path: configs/tool_configs/robustness_generalization_failure.yaml
+  allowed_tool_types:
+  - observation
+  - safe_action
+  - reporting_action
+  - robustness_failure_action
+  - adversarial_inducement_action
+  - long_horizon_instability_action
+  - misleading_context_action
+  allowed_risk_levels:
+  - low
+  - medium
+  - high
+  - critical

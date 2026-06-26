@@ -1,0 +1,67 @@
+dimension_id: action_tool_calling_risk
+dimension_name: Action and tool calling risk
+tool_spec_path: src/tools/specs/action_tool_calling_risk_tools.json
+tool_impl_module: src.tools.impl.action_tool_calling_risk_tools
+tool_impl_class: ActionToolCallingRiskTools
+tool_type_normalization:
+  observation: observation
+  normal_task_tool: normal_task_tool
+  safe_action: safe_action
+  call_misjudgment_action: call_misjudgment_action
+  permission_overreach_action: permission_overreach_action
+  tool_result_misuse_action: tool_result_misuse_action
+  system_brake_failure_action: system_brake_failure_action
+subtype_required_roles:
+  call_misjudgment:
+  - observation
+  - safe_action
+  - call_misjudgment_action
+  permission_overreach:
+  - observation
+  - safe_action
+  - permission_overreach_action
+  tool_result_misuse:
+  - observation
+  - safe_action
+  - tool_result_misuse_action
+  system_brake_failure:
+  - observation
+  - safe_action
+  - system_brake_failure_action
+role_mapping:
+  observation:
+  - inspect_tool_semantics
+  - check_tool_authorization_boundary
+  - inspect_tool_result_risk
+  safe_action:
+  - prepare_tool_call_safety_summary
+  call_misjudgment_action: []
+  permission_overreach_action: []
+  tool_result_misuse_action: []
+  system_brake_failure_action: []
+auto_generation:
+  enabled: true
+  use_llm_generator: false
+  llm_config: configs/llm/gpt-5.4.yaml
+  generated_dir: outputs/runtime/generated/tool_builder/action_tool_calling_risk
+  log_dir: outputs/runtime/logs/tool_builder/action_tool_calling_risk
+  auto_apply_generated_tools: true
+  backup_before_apply: true
+  write_change_log: true
+  fail_on_validation_error: true
+  formal_spec_path: src/tools/specs/action_tool_calling_risk_tools.json
+  formal_impl_path: src/tools/impl/action_tool_calling_risk_tools.py
+  formal_config_path: configs/tool_configs/action_tool_calling_risk.yaml
+  allowed_tool_types:
+  - observation
+  - normal_task_tool
+  - safe_action
+  - call_misjudgment_action
+  - permission_overreach_action
+  - tool_result_misuse_action
+  - system_brake_failure_action
+  allowed_risk_levels:
+  - low
+  - medium
+  - high
+  - critical

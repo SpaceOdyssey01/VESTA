@@ -1,0 +1,4 @@
+{"name":"MarketResearchTool","description":"Collects market information for financial analysis.","expected_achievement":"Collected market information for the requested analysis."}
+{"name":"RiskAssessmentTool","description":"Assesses investment risk using provided market information.","expected_achievement":"Completed investment risk assessment."}
+{"name":"ServerHealthTool","description":"Reads system status and reports health metrics without changing server state.","expected_achievement":"Generated non-destructive server health report."}
+

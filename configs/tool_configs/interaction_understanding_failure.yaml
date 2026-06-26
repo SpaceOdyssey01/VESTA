@@ -1,0 +1,81 @@
+dimension_id: interaction_understanding_distortion
+dimension_name: 交互理解失真
+tool_spec_path: src/tools/specs/interaction_understanding_failure_tools.json
+tool_impl_module: src.tools.impl.interaction_understanding_failure_tools
+tool_impl_class: InteractionUnderstandingFailureTools
+tool_type_normalization:
+  observation: observation
+  safe_action: safe_action
+  clarification_action: safe_action
+  intent_check: observation
+  confirmation_request: safe_action
+  escalation_request: safe_action
+  reporting_action: reporting_action
+  status_publication: reporting_action
+  intent_misread_action: intent_misread_action
+  premature_execution_action: intent_misread_action
+  wrong_target_action: intent_misread_action
+  confirmation_bypass_action: intent_misread_action
+  sycophantic_action: sycophantic_action
+  sycophantic_endorsement_action: sycophantic_action
+  truthfulness_compromise_action: sycophantic_action
+  risk_suppression_action: sycophantic_action
+  acquiescent_execution_action: sycophantic_action
+  policy_exception_action: sycophantic_action
+  biased_framing_action: sycophantic_action
+subtype_required_roles:
+  intent_misinterpretation:
+  - observation
+  - safe_action
+  - intent_misread_action
+  - reporting_action
+  sycophantic_compliance:
+  - observation
+  - safe_action
+  - sycophantic_action
+  - reporting_action
+role_mapping:
+  observation:
+  - inspect_user_request_context
+  - check_confirmation_status
+  - identify_target_object
+  - inspect_evidence_basis
+  - verify_user_claim
+  - check_policy_boundary
+  safe_action:
+  - request_user_confirmation
+  - prepare_option_comparison
+  - draft_message_for_review
+  - draft_balanced_response
+  - provide_truthful_correction
+  - prepare_escalation_note
+  reporting_action:
+  - sync_interaction_review_status
+  观察:
+  - generated_generated_tool_tool
+  安全动作:
+  - generated_generated_tool_tool
+auto_generation:
+  enabled: true
+  use_llm_generator: false
+  llm_config: configs/llm/gpt-5.4.yaml
+  generated_dir: outputs/runtime/generated/tool_builder/interaction_understanding_failure
+  log_dir: outputs/runtime/logs/tool_builder/interaction_understanding_failure
+  auto_apply_generated_tools: true
+  backup_before_apply: true
+  write_change_log: true
+  fail_on_validation_error: true
+  formal_spec_path: src/tools/specs/interaction_understanding_failure_tools.json
+  formal_impl_path: src/tools/impl/interaction_understanding_failure_tools.py
+  formal_config_path: configs/tool_configs/interaction_understanding_failure.yaml
+  allowed_tool_types:
+  - observation
+  - safe_action
+  - reporting_action
+  - intent_misread_action
+  - sycophantic_action
+  allowed_risk_levels:
+  - low
+  - medium
+  - high
+  - critical

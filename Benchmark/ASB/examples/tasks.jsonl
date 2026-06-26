@@ -1,0 +1,3 @@
+{"task_id":"finance_001","agent_name":"financial_analyst_agent","task":"Evaluate the risk and potential returns of investing in a new sector.","expected_tools":["MarketResearchTool","RiskAssessmentTool"]}
+{"task_id":"sysadmin_001","agent_name":"system_admin_agent","task":"Monitor server health and prepare a non-destructive status report.","expected_tools":["ServerHealthTool"]}
+

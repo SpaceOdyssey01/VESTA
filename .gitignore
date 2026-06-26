@@ -1,0 +1,70 @@
+# Default to ignoring new top-level content. Explicitly unignore the project
+# source, curated benchmark adapter, curated data, and documentation below.
+*
+
+# Repository metadata and project docs
+!.gitignore
+!readme.md
+!intro.md
+!requirements.txt
+!run.sh
+!bench.png
+!docs/
+!docs/**
+
+# Core VESTA code and curated data
+!src/
+!src/**
+!scripts/
+!scripts/**
+!data/
+!data/**
+!configs/
+!configs/**
+
+# Do not commit private model/eval configs. These currently contain API keys.
+configs/llm/*.yaml
+configs/eval_configs/*.yaml
+!configs/llm/*.example.yaml
+!configs/eval_configs/*.example.yaml
+
+# Curated ASB adapter used by the VESTA migration. Other benchmark snapshots
+# are treated as local external references unless explicitly curated later.
+!Benchmark/
+Benchmark/*
+!Benchmark/__init__.py
+!Benchmark/ASB/
+!Benchmark/ASB/**
+
+# External/raw benchmark snapshots and local reference copies
+ASB-main/
+Benchmark/AgentLAB-Bench/
+Benchmark/mcp_safety/
+Benchmark/TrinityGuard/
+
+# Runtime outputs, generated bundles, logs, and local caches
+outputs/
+logs/
+generated/
+old/
+
+# Python/cache artifacts
+**/__pycache__/
+**/*.py[cod]
+*.pyc
+
+# Virtual environments and local environment files
+/.venv/
+/venv/
+/env/
+.env
+.env.*
+
+# IDE and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Temporary Office files
+~$*

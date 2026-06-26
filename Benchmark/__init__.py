@@ -1,0 +1,2 @@
+"""Benchmark collection package."""
+

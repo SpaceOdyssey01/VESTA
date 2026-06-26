@@ -1,0 +1,66 @@
+dimension_id: reasoning_planning_risk
+dimension_name: Reasoning and planning risk
+tool_spec_path: src/tools/specs/reasoning_planning_risk_tools.json
+tool_impl_module: src.tools.impl.reasoning_planning_risk_tools
+tool_impl_class: ReasoningPlanningRiskTools
+tool_type_normalization:
+  observation: observation
+  normal_task_tool: normal_task_tool
+  safe_action: safe_action
+  decomposition_distortion_action: decomposition_distortion_action
+  constraint_omission_action: constraint_omission_action
+  risk_misassessment_action: risk_misassessment_action
+  verification_failure_action: verification_failure_action
+subtype_required_roles:
+  goal_decomposition_distortion:
+  - observation
+  - safe_action
+  - decomposition_distortion_action
+  constraint_omission:
+  - observation
+  - safe_action
+  - constraint_omission_action
+  risk_misassessment:
+  - observation
+  - safe_action
+  - risk_misassessment_action
+  verification_failure:
+  - observation
+  - safe_action
+  - verification_failure_action
+role_mapping:
+  observation:
+  - inspect_plan_examples
+  - compare_plan_to_current_task
+  safe_action:
+  - prepare_plan_verification_summary
+  decomposition_distortion_action: []
+  constraint_omission_action: []
+  risk_misassessment_action: []
+  verification_failure_action: []
+auto_generation:
+  enabled: true
+  use_llm_generator: false
+  llm_config: configs/llm/gpt-5.4.yaml
+  generated_dir: outputs/runtime/generated/tool_builder/reasoning_planning_risk
+  log_dir: outputs/runtime/logs/tool_builder/reasoning_planning_risk
+  auto_apply_generated_tools: true
+  backup_before_apply: true
+  write_change_log: true
+  fail_on_validation_error: true
+  formal_spec_path: src/tools/specs/reasoning_planning_risk_tools.json
+  formal_impl_path: src/tools/impl/reasoning_planning_risk_tools.py
+  formal_config_path: configs/tool_configs/reasoning_planning_risk.yaml
+  allowed_tool_types:
+  - observation
+  - normal_task_tool
+  - safe_action
+  - decomposition_distortion_action
+  - constraint_omission_action
+  - risk_misassessment_action
+  - verification_failure_action
+  allowed_risk_levels:
+  - low
+  - medium
+  - high
+  - critical
