@@ -84,6 +84,25 @@ DEFAULT_DIMENSION_SUBTYPES = {
         "opinion_manipulation",
         "false_majority_signal",
     ],
+    "external_content_pollution": [
+        "indirect_injection", "content_misdirection", "multimodal_pollution",
+    ],
+    "external_state_distortion": [
+        "state_misreporting", "action_feedback_distortion",
+    ],
+    "external_resource_failure": [
+        "knowledge_source_poisoning", "service_resource_compromise", "device_environment_compromise",
+    ],
+    "real_world_consequence_amplification": [
+        "data_asset_damage", "sensitive_information_leakage", "physical_risk_realization",
+    ],
+    "open_world_residual_risk": [
+        "unknown_carrier", "abnormal_context", "compositional_risk",
+    ],
+    "interface_semantic_pollution": ["description_pollution", "schema_pollution", "return_semantic_pollution"],
+    "identity_authorization_confusion": ["interface_service_impersonation", "authorization_misbinding", "delegation_overreach"],
+    "protocol_semantic_mismatch": ["message_mismatch", "state_mismatch", "cross_protocol_mismatch"],
+    "capability_version_instability": ["capability_drift", "composition_drift", "version_instability"],
 }
 
 

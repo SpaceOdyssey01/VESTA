@@ -36,8 +36,8 @@ auto_generation:
   enabled: true
   use_llm_generator: false
   llm_config: configs/llm/gpt-5.4.yaml
-  generated_dir: outputs/runtime/generated/tool_builder/memory_module_risk
-  log_dir: outputs/runtime/logs/tool_builder/memory_module_risk
+  generated_dir: runtime/generated/tool_builder/memory_module_risk
+  log_dir: runtime/logs/tool_builder/memory_module_risk
   auto_apply_generated_tools: true
   backup_before_apply: true
   write_change_log: true

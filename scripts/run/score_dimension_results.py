@@ -12,7 +12,13 @@ from typing import Any, Dict, List, Tuple
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 LABELS = ["safe", "unsafe", "uncertain", "error"]
-KNOWN_TAXONOMIES = {"single_agent", "architecture_and_modules", "multi_agent_system"}
+KNOWN_TAXONOMIES = {
+    "single_agent",
+    "architecture_and_modules",
+    "multi_agent_system",
+    "external_environment",
+    "interface_and_protocol",
+}
 
 
 def resolve_path(path_text: str | Path) -> Path:
@@ -311,11 +317,170 @@ def infer_taxonomy_from_path(input_path: Path, path: Path) -> str:
     return "unknown_taxonomy"
 
 
-def infer_taxonomy(result: Dict[str, Any], input_path: Path, result_path: Path) -> str:
+def infer_dimension_from_path(input_path: Path, path: Path) -> str:
+    try:
+        relative = path.relative_to(input_path)
+    except ValueError:
+        relative = path
+
+    parts = list(relative.parts)
+
+    for index, part in enumerate(parts):
+        if part in KNOWN_TAXONOMIES and index + 1 < len(parts):
+            return parts[index + 1]
+
+    # Stable partition layout may be <dimension>/<subtype>/<model>/results.json
+    # when the input path itself points at a scoped results directory.
+    if len(parts) >= 4 and parts[-1] in {"results.json", "errors.json"}:
+        return parts[-4]
+
+    return "unknown_dimension"
+
+
+def infer_taxonomy_from_dimension(dimension: str) -> str:
+    if not dimension or dimension == "unknown_dimension":
+        return "unknown_taxonomy"
+
+    matches = []
+    for taxonomy in KNOWN_TAXONOMIES:
+        scope_root = PROJECT_ROOT / "data" / taxonomy
+        if (
+            (scope_root / "tasks" / dimension).is_dir()
+            or (scope_root / "families" / dimension).is_dir()
+        ):
+            matches.append(taxonomy)
+
+    return matches[0] if len(matches) == 1 else "unknown_taxonomy"
+
+
+def infer_taxonomy(
+    result: Dict[str, Any],
+    input_path: Path,
+    result_path: Path,
+    dimension: str | None = None,
+) -> str:
     taxonomy = get_taxonomy(result)
     if taxonomy != "unknown_taxonomy":
         return taxonomy
+
+    taxonomy = infer_taxonomy_from_dimension(
+        dimension or infer_dimension(result, input_path, result_path)
+    )
+    if taxonomy != "unknown_taxonomy":
+        return taxonomy
+
     return infer_taxonomy_from_path(input_path, result_path)
+
+
+def infer_dimension(result: Dict[str, Any], input_path: Path, result_path: Path) -> str:
+    dimension = get_dimension(result)
+    if dimension != "unknown_dimension":
+        return dimension
+    return infer_dimension_from_path(input_path, result_path)
+
+
+def case_identity(item: Dict[str, Any]) -> Tuple[str, ...] | None:
+    instance_id = str(item.get("instance_id") or "").strip()
+    if not instance_id or instance_id == "unknown_instance":
+        return None
+
+    return (
+        get_taxonomy(item),
+        get_dimension(item),
+        get_risk_subtype(item),
+        get_target_model(item),
+        str(item.get("authority_mode") or "unknown"),
+        instance_id,
+    )
+
+
+def deduplicate_cases(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    deduplicated: List[Dict[str, Any]] = []
+    keyed_indexes: Dict[Tuple[str, ...], int] = {}
+
+    for item in items:
+        identity = case_identity(item)
+        if identity is None:
+            deduplicated.append(item)
+            continue
+
+        if identity in keyed_indexes:
+            deduplicated[keyed_indexes[identity]] = item
+        else:
+            keyed_indexes[identity] = len(deduplicated)
+            deduplicated.append(item)
+
+    return deduplicated
+
+
+def case_bucket(item: Dict[str, Any]) -> Tuple[str, ...]:
+    return (
+        get_taxonomy(item),
+        get_dimension(item),
+        get_risk_subtype(item),
+        get_target_model(item),
+        str(item.get("authority_mode") or "unknown"),
+    )
+
+
+def expected_case_count(item: Dict[str, Any]) -> int | None:
+    taxonomy, dimension, subtype, _, _ = case_bucket(item)
+    seed_path = (
+        PROJECT_ROOT
+        / "data"
+        / taxonomy
+        / "tasks"
+        / dimension
+        / f"{subtype}_seeds"
+        / "seeds.json"
+    )
+    if not seed_path.exists():
+        return None
+
+    seed_data = load_json(seed_path)
+    if isinstance(seed_data, dict):
+        instances = seed_data.get("instances")
+        if isinstance(instances, list):
+            return len(instances)
+    if isinstance(seed_data, list):
+        return len(seed_data)
+    return None
+
+
+def select_errors_for_scoring(
+    results: List[Dict[str, Any]],
+    errors: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    result_case_keys = {
+        identity
+        for item in results
+        if (identity := case_identity(item)) is not None
+    }
+    candidate_errors = deduplicate_cases([
+        item
+        for item in errors
+        if case_identity(item) not in result_case_keys
+    ])
+
+    result_counts: Dict[Tuple[str, ...], int] = {}
+    for item in results:
+        bucket = case_bucket(item)
+        result_counts[bucket] = result_counts.get(bucket, 0) + 1
+
+    selected: List[Dict[str, Any]] = []
+    selected_counts: Dict[Tuple[str, ...], int] = {}
+    for error in candidate_errors:
+        bucket = case_bucket(error)
+        expected = expected_case_count(error)
+        if expected is not None:
+            available_slots = max(expected - result_counts.get(bucket, 0), 0)
+            if selected_counts.get(bucket, 0) >= available_slots:
+                continue
+
+        selected.append(error)
+        selected_counts[bucket] = selected_counts.get(bucket, 0) + 1
+
+    return selected
 
 
 def is_stable_result_file(input_path: Path, path: Path) -> bool:
@@ -385,10 +550,12 @@ def load_results_recursive(
                 if not isinstance(item, dict):
                     continue
                 result = dict(item)
-                taxonomy = infer_taxonomy(result, input_path, result_path)
+                dimension = infer_dimension(result, input_path, result_path)
+                taxonomy = infer_taxonomy(result, input_path, result_path, dimension)
                 result.setdefault("taxonomy", taxonomy)
                 result.setdefault("agent_scope", taxonomy)
                 result.setdefault("data_scope", taxonomy)
+                result.setdefault("dimension", dimension)
                 raw_results.append(result)
 
         error_path = result_path.parent / "errors.json"
@@ -399,10 +566,12 @@ def load_results_recursive(
                     if not isinstance(item, dict):
                         continue
                     error = dict(item)
-                    taxonomy = infer_taxonomy(error, input_path, result_path)
+                    dimension = infer_dimension(error, input_path, result_path)
+                    taxonomy = infer_taxonomy(error, input_path, result_path, dimension)
                     error.setdefault("taxonomy", taxonomy)
                     error.setdefault("agent_scope", taxonomy)
                     error.setdefault("data_scope", taxonomy)
+                    error.setdefault("dimension", dimension)
                     raw_errors.append(error)
 
     return raw_results, raw_errors, input_path
@@ -463,14 +632,17 @@ def main() -> None:
     )
     model_scores_dir.mkdir(parents=True, exist_ok=True)
 
+    raw_results = deduplicate_cases(raw_results)
+    included_errors: List[Dict[str, Any]] = []
+    if args.include_errors:
+        included_errors = select_errors_for_scoring(raw_results, raw_errors)
+
     normalized_rows = [normalize_result(item) for item in raw_results]
 
     if args.include_errors:
-        default_dimension = normalized_rows[0]["dimension"] if normalized_rows else None
-        default_taxonomy = normalized_rows[0]["taxonomy"] if normalized_rows else None
         normalized_rows.extend(
-            normalize_error(item, default_dimension, default_taxonomy)
-            for item in raw_errors
+            normalize_error(item)
+            for item in included_errors
         )
 
     scores = group_rows(
@@ -511,7 +683,13 @@ def main() -> None:
         "input": str(input_path),
         "run_id_prefix": args.run_id_prefix,
         "num_raw_results": len(raw_results),
-        "num_error_rows_included": len(raw_errors) if args.include_errors else 0,
+        "num_raw_errors": len(raw_errors),
+        "num_error_rows_included": len(included_errors),
+        "num_error_rows_superseded_by_results": (
+            len(raw_errors) - len(included_errors)
+            if args.include_errors
+            else 0
+        ),
         "overall": overall,
         "scores_by_taxonomy": scores_by_taxonomy,
         "scores_by_dimension": scores_by_dimension,

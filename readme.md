@@ -261,7 +261,7 @@ tool builder 部分的大致流程：
    - 自动合并到正式 spec 文件
    - 自动合并到正式 impl 文件
    - 自动更新 config `role_mapping`
-6. 同时在 `outputs/runtime/logs/tool_builder/<dimension>/` 写入记录
+6. 同时在 `runtime/logs/tool_builder/<dimension>/` 写入记录
 
 ## 7. Tool Bundle Smoke Test
 

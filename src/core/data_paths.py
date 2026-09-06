@@ -9,6 +9,8 @@ DATA_SCOPES = [
     DEFAULT_AGENT_SCOPE,
     "architecture_and_modules",
     "multi_agent_system",
+    "external_environment",
+    "interface_and_protocol",
 ]
 
 LEGACY_SEED_DIRS = {

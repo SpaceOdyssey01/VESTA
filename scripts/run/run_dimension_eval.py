@@ -20,7 +20,7 @@ from src.core.data_paths import family_path_for, seed_path_for
 
 
 DEFAULT_DIMENSION = "autonomy_authority_failure"
-AGENT_SCOPES = {"single_agent", "architecture_and_modules", "multi_agent_system"}
+AGENT_SCOPES = {"single_agent", "architecture_and_modules", "multi_agent_system", "external_environment", "interface_and_protocol"}
 
 DIMENSION_SUBTYPES = {
     "autonomy_authority_failure": [
@@ -95,7 +95,16 @@ DIMENSION_SUBTYPES = {
         "social_pressure",
         "opinion_manipulation",
         "false_majority_signal"
-    ]
+    ],
+    "external_content_pollution": ["indirect_injection", "content_misdirection", "multimodal_pollution"],
+    "external_state_distortion": ["state_misreporting", "action_feedback_distortion"],
+    "external_resource_failure": ["knowledge_source_poisoning", "service_resource_compromise", "device_environment_compromise"],
+    "real_world_consequence_amplification": ["data_asset_damage", "sensitive_information_leakage", "physical_risk_realization"],
+    "open_world_residual_risk": ["unknown_carrier", "abnormal_context", "compositional_risk"],
+    "interface_semantic_pollution": ["description_pollution", "schema_pollution", "return_semantic_pollution"],
+    "identity_authorization_confusion": ["interface_service_impersonation", "authorization_misbinding", "delegation_overreach"],
+    "protocol_semantic_mismatch": ["message_mismatch", "state_mismatch", "cross_protocol_mismatch"],
+    "capability_version_instability": ["capability_drift", "composition_drift", "version_instability"]
 }
 
 RUNNER_CANDIDATES = [
@@ -388,7 +397,8 @@ def normalize_result(
             "raw_result": raw_result
         }
 
-    result.setdefault("instance_id", instance.get("instance_id"))
+    if not result.get("instance_id") or result.get("instance_id") == "unknown_instance":
+        result["instance_id"] = instance.get("instance_id")
     result.setdefault("dimension", dimension)
     result.setdefault("risk_dimension", dimension)
     result.setdefault("family_id", f"{dimension}.{subtype}")
@@ -497,7 +507,7 @@ def main() -> None:
     parser.add_argument("--seed-filename", type=str, default="seeds.json")
     parser.add_argument(
         "--agent-scope",
-        choices=["auto", "single_agent", "architecture_and_modules", "multi_agent_system"],
+        choices=["auto", "single_agent", "architecture_and_modules", "multi_agent_system", "external_environment", "interface_and_protocol"],
         default="auto",
         help="Data/output scope. auto resolves existing seed/family paths and writes under that scope."
     )
@@ -561,7 +571,7 @@ def main() -> None:
         "resume": args.resume,
         "rerun_existing": args.rerun_existing,
         "output_root": str(output_root),
-        "output_layout": "outputs/results/<single_agent|architecture_and_modules|multi_agent_system>/<dimension>/<subtype>/<model>/"
+        "output_layout": "outputs/results/<single_agent|architecture_and_modules|multi_agent_system|external_environment|interface_and_protocol>/<dimension>/<subtype>/<model>/"
     }
 
     runner_cls = load_runner_class()
@@ -726,6 +736,9 @@ def main() -> None:
                 "status": "error",
                 "key": case["key"],
                 "error": {
+                    "dimension": args.dimension,
+                    "agent_scope": case["agent_scope"],
+                    "data_scope": case["agent_scope"],
                     "subtype": subtype,
                     "instance_id": instance_id,
                     "target_llm_config": target_llm_config,
@@ -815,7 +828,7 @@ def main() -> None:
         "num_results": len(results),
         "num_errors": len(errors),
         "partition_manifest_json": str(output_root / "partition_manifest.json"),
-        "output_layout": str(output_root / "<single_agent|architecture_and_modules|multi_agent_system>" / args.dimension / "<subtype>" / "<model>")
+        "output_layout": str(output_root / "<single_agent|architecture_and_modules|multi_agent_system|external_environment|interface_and_protocol>" / args.dimension / "<subtype>" / "<model>")
     }, ensure_ascii=False, indent=2))
 
 

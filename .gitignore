@@ -36,16 +36,17 @@ Benchmark/*
 !Benchmark/ASB/
 !Benchmark/ASB/**
 
-# External/raw benchmark snapshots and local reference copies
-ASB-main/
-Benchmark/AgentLAB-Bench/
-Benchmark/mcp_safety/
-Benchmark/TrinityGuard/
+# Local materials kept outside the curated Benchmark adapters
+# Upstream/raw benchmark repositories
+external/
+# Local benchmark prototypes and simulations
+experiments/
+# Human-authored mapping sheets and reference material
+references/
 
-# Runtime outputs, generated bundles, logs, and local caches
+# Runtime working files, experiment outputs, and local caches
+runtime/
 outputs/
-logs/
-generated/
 old/
 
 # Python/cache artifacts

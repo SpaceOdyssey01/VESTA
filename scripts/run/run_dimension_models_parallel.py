@@ -13,7 +13,13 @@ from pathlib import Path
 from typing import List, Sequence
 
 
-DATA_SCOPES = {"single_agent", "architecture_and_modules", "multi_agent_system"}
+DATA_SCOPES = {
+    "single_agent",
+    "architecture_and_modules",
+    "multi_agent_system",
+    "external_environment",
+    "interface_and_protocol",
+}
 
 
 @dataclass(frozen=True)
@@ -68,8 +74,12 @@ def discover_dimensions(root: Path, agent_scope: str = "single_agent") -> List[s
     dimensions = task_dimensions & family_dimensions
 
     config_filter = configured_dimensions
-    if agent_scope == "multi_agent_system":
-        # Multi-agent system dimensions share configs/tool_configs/multi_agent_system.yaml.
+    if agent_scope in {
+        "multi_agent_system",
+        "external_environment",
+        "interface_and_protocol",
+    }:
+        # These scopes intentionally use one shared tool config per scope.
         config_filter = None
 
     if config_filter is not None:
@@ -287,7 +297,7 @@ def main() -> None:
         raise FileNotFoundError(f"Eval script not found: {eval_script}")
 
     batch_id = datetime.now().strftime("%Y%m%d-%H%M%S")
-    log_dir = Path(args.log_dir).resolve() if args.log_dir else root / "outputs" / "logs" / "run_models" / batch_id
+    log_dir = Path(args.log_dir).resolve() if args.log_dir else root / "runtime" / "logs" / "run_models" / batch_id
 
     jobs = []
     for target in targets:

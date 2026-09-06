@@ -561,7 +561,7 @@ Commands run:
 ```powershell
 python scripts\expand\build_dimension_tools.py --dimension reasoning_planning_risk --subtypes goal_decomposition_distortion constraint_omission risk_misassessment verification_failure
 python -m py_compile src\tools\impl\reasoning_planning_risk_tools.py scripts\expand\build_dimension_tools.py scripts\run\run_dimension_eval.py
-python scripts\run\run_dimension_eval.py --dimension reasoning_planning_risk --subtypes all --agent-scope architecture_and_modules --limit 0 --output-root outputs\results_layout_check
+python scripts\run\run_dimension_eval.py --dimension reasoning_planning_risk --subtypes all --agent-scope architecture_and_modules --limit 0 --output-root runtime\layout_checks
 ```
 
 Runtime checks:
@@ -676,7 +676,7 @@ Commands run:
 ```powershell
 python scripts\expand\build_dimension_tools.py --dimension action_tool_calling_risk --subtypes call_misjudgment permission_overreach tool_result_misuse system_brake_failure
 python -m py_compile src\tools\impl\action_tool_calling_risk_tools.py scripts\expand\build_dimension_tools.py scripts\run\run_dimension_eval.py
-python scripts\run\run_dimension_eval.py --dimension action_tool_calling_risk --subtypes all --agent-scope architecture_and_modules --limit 0 --output-root outputs\results_layout_check
+python scripts\run\run_dimension_eval.py --dimension action_tool_calling_risk --subtypes all --agent-scope architecture_and_modules --limit 0 --output-root runtime\layout_checks
 ```
 
 Runtime checks:
@@ -762,8 +762,8 @@ Commands run:
 
 ```powershell
 python -m py_compile src\targets\single_agent_safety_prompt_builder.py src\tools\impl\input_perception_risk_tools.py src\tools\impl\memory_module_risk_tools.py
-python scripts\run\run_dimension_eval.py --dimension input_perception_risk --subtypes all --agent-scope architecture_and_modules --limit 0 --output-root outputs\results_layout_check
-python scripts\run\run_dimension_eval.py --dimension memory_module_risk --subtypes all --agent-scope architecture_and_modules --limit 0 --output-root outputs\results_layout_check
+python scripts\run\run_dimension_eval.py --dimension input_perception_risk --subtypes all --agent-scope architecture_and_modules --limit 0 --output-root runtime\layout_checks
+python scripts\run\run_dimension_eval.py --dimension memory_module_risk --subtypes all --agent-scope architecture_and_modules --limit 0 --output-root runtime\layout_checks
 ```
 
 Additional prompt scan:

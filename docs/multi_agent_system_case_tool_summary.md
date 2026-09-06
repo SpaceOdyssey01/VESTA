@@ -335,16 +335,16 @@ TrinityGuard 主要作为攻击模式参考，尤其是消息篡改、恶意传�
 ```powershell
 python scripts\multi_agent_system\generate_multi_agent_system_seeds.py
 python -m py_compile scripts\multi_agent_system\generate_multi_agent_system_seeds.py src\tools\impl\multi_agent_system_tools.py src\targets\single_agent_safety_prompt_builder.py scripts\expand\build_dimension_tools.py scripts\run\run_dimension_eval.py
-python scripts\expand\build_dimension_tools.py --dimension collective_cognition_distortion --subtypes all --strict --summary-json outputs\runtime\logs\collective_cognition_distortion_build_summary.json
-python scripts\expand\build_dimension_tools.py --dimension coordination_order_disruption --subtypes all --strict --summary-json outputs\runtime\logs\coordination_order_disruption_build_summary.json
-python scripts\expand\build_dimension_tools.py --dimension coalition_power_imbalance --subtypes all --strict --summary-json outputs\runtime\logs\coalition_power_imbalance_build_summary.json
-python scripts\expand\build_dimension_tools.py --dimension interaction_chain_compromise --subtypes all --strict --summary-json outputs\runtime\logs\interaction_chain_compromise_build_summary.json
-python scripts\expand\build_dimension_tools.py --dimension group_pressure_manipulation --subtypes all --strict --summary-json outputs\runtime\logs\group_pressure_manipulation_build_summary.json
-python scripts\run\run_dimension_eval.py --dimension collective_cognition_distortion --subtypes all --agent-scope multi_agent_system --limit 0 --output-root outputs\results_layout_check
-python scripts\run\run_dimension_eval.py --dimension coordination_order_disruption --subtypes all --agent-scope multi_agent_system --limit 0 --output-root outputs\results_layout_check
-python scripts\run\run_dimension_eval.py --dimension coalition_power_imbalance --subtypes all --agent-scope multi_agent_system --limit 0 --output-root outputs\results_layout_check
-python scripts\run\run_dimension_eval.py --dimension interaction_chain_compromise --subtypes all --agent-scope multi_agent_system --limit 0 --output-root outputs\results_layout_check
-python scripts\run\run_dimension_eval.py --dimension group_pressure_manipulation --subtypes all --agent-scope multi_agent_system --limit 0 --output-root outputs\results_layout_check
+python scripts\expand\build_dimension_tools.py --dimension collective_cognition_distortion --subtypes all --strict --summary-json runtime\logs\collective_cognition_distortion_build_summary.json
+python scripts\expand\build_dimension_tools.py --dimension coordination_order_disruption --subtypes all --strict --summary-json runtime\logs\coordination_order_disruption_build_summary.json
+python scripts\expand\build_dimension_tools.py --dimension coalition_power_imbalance --subtypes all --strict --summary-json runtime\logs\coalition_power_imbalance_build_summary.json
+python scripts\expand\build_dimension_tools.py --dimension interaction_chain_compromise --subtypes all --strict --summary-json runtime\logs\interaction_chain_compromise_build_summary.json
+python scripts\expand\build_dimension_tools.py --dimension group_pressure_manipulation --subtypes all --strict --summary-json runtime\logs\group_pressure_manipulation_build_summary.json
+python scripts\run\run_dimension_eval.py --dimension collective_cognition_distortion --subtypes all --agent-scope multi_agent_system --limit 0 --output-root runtime\layout_checks
+python scripts\run\run_dimension_eval.py --dimension coordination_order_disruption --subtypes all --agent-scope multi_agent_system --limit 0 --output-root runtime\layout_checks
+python scripts\run\run_dimension_eval.py --dimension coalition_power_imbalance --subtypes all --agent-scope multi_agent_system --limit 0 --output-root runtime\layout_checks
+python scripts\run\run_dimension_eval.py --dimension interaction_chain_compromise --subtypes all --agent-scope multi_agent_system --limit 0 --output-root runtime\layout_checks
+python scripts\run\run_dimension_eval.py --dimension group_pressure_manipulation --subtypes all --agent-scope multi_agent_system --limit 0 --output-root runtime\layout_checks
 ```
 
 验证结果：

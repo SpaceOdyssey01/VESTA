@@ -71,8 +71,8 @@ auto_generation:
   formal_impl_path: src/tools/impl/goal_norm_misalignment_tools.py
   formal_config_path: configs/tool_configs/goal_norm_misalignment.yaml
 
-  generated_dir: generated/tool_builder/goal_norm_misalignment
-  log_dir: logs/tool_builder/goal_norm_misalignment
+  generated_dir: runtime/generated/tool_builder/goal_norm_misalignment
+  log_dir: runtime/logs/tool_builder/goal_norm_misalignment
 
   allowed_tool_types:
     - observation

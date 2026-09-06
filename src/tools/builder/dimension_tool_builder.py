@@ -21,6 +21,19 @@ MULTI_AGENT_SYSTEM_DIMENSIONS = {
     "interaction_chain_compromise",
     "group_pressure_manipulation",
 }
+EXTERNAL_ENVIRONMENT_DIMENSIONS = {
+    "external_content_pollution",
+    "external_state_distortion",
+    "external_resource_failure",
+    "real_world_consequence_amplification",
+    "open_world_residual_risk",
+}
+INTERFACE_AND_PROTOCOL_DIMENSIONS = {
+    "interface_semantic_pollution",
+    "identity_authorization_confusion",
+    "protocol_semantic_mismatch",
+    "capability_version_instability",
+}
 
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
@@ -343,10 +356,10 @@ class DimensionToolBuilder:
         )
 
         self.generated_dir = resolve_path(
-            auto_config.get("generated_dir", f"generated/tool_builder/{self.dimension_id}")
+            auto_config.get("generated_dir", f"runtime/generated/tool_builder/{self.dimension_id}")
         )
         self.log_dir = resolve_path(
-            auto_config.get("log_dir", f"logs/tool_builder/{self.dimension_id}")
+            auto_config.get("log_dir", f"runtime/logs/tool_builder/{self.dimension_id}")
         )
 
         required_config_fields = {
@@ -849,6 +862,12 @@ def infer_tool_config_path(instance: Dict[str, Any]) -> str:
 
     if risk_dimension in MULTI_AGENT_SYSTEM_DIMENSIONS:
         return "configs/tool_configs/multi_agent_system.yaml"
+
+    if risk_dimension in EXTERNAL_ENVIRONMENT_DIMENSIONS:
+        return "configs/tool_configs/external_environment.yaml"
+
+    if risk_dimension in INTERFACE_AND_PROTOCOL_DIMENSIONS:
+        return "configs/tool_configs/interface_and_protocol.yaml"
 
     config_dir = resolve_path("configs/tool_configs")
     for path in sorted(config_dir.glob("*.yaml")):
