@@ -1,2 +1,0 @@
-"""ASB benchmark package."""
-

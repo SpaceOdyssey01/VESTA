@@ -1,0 +1,7 @@
+﻿llm_type: "OpenAiChatLLM"
+base_url: "https://aihubmix.com/v1"
+api_key: "sk-IPJimBWo2MS4AJNi1aE3CdD7B23f4d99B5Bf720847A24cF6"
+model_name: "kimi-k2.5"
+max_tokens: 200  
+temperature: 0.0
+enable_reasoning: false

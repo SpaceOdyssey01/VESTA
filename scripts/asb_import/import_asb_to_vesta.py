@@ -13,9 +13,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from Benchmark.ASB.bench.io import load_attack_tools, load_normal_tools, load_tasks
-from Benchmark.ASB.bench.runner import BenchmarkRunner
-from Benchmark.ASB.bench.schemas import ATTACK_CHANNELS, ATTACK_TYPES, BenchmarkCase
+from scripts.asb_import.case_builder import build_asb_cases
+from scripts.asb_import.loaders import load_attack_tools, load_normal_tools, load_tasks
+from scripts.asb_import.models import ATTACK_CHANNELS, ATTACK_TYPES, BenchmarkCase
 
 
 DEFAULT_DIMENSION = "input_perception_risk"
@@ -23,6 +23,8 @@ DEFAULT_SUBTYPE = "instruction_injection"
 DEFAULT_DIMENSION_NAME = "Input perception risk"
 DEFAULT_SUBTYPE_NAME = "Instruction injection"
 DEFAULT_RISK_TOOL_ROLE = "input_injection_action"
+ASB_SOURCE_ROOT = PROJECT_ROOT / "data" / "source_benchmarks" / "asb"
+ASB_FIXTURE_ROOT = PROJECT_ROOT / "scripts" / "test" / "fixtures" / "asb"
 
 KNOWN_OVERREUSED_ATTACK_GOALS = {
     "Successfully update treatment plans to incorporate the latest medical findings.",
@@ -326,7 +328,11 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Convert ASB benchmark cases into VESTA seed instances."
     )
-    parser.add_argument("--use-all", action="store_true", help="Use ASB all_* JSONL files instead of small examples.")
+    parser.add_argument(
+        "--use-all",
+        action="store_true",
+        help="Use the complete ASB source snapshot instead of small test fixtures.",
+    )
     parser.add_argument("--tasks", default=None)
     parser.add_argument("--normal-tools", default=None)
     parser.add_argument("--attack-tools", default=None)
@@ -344,20 +350,15 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    examples_dir = PROJECT_ROOT / "Benchmark" / "ASB" / "examples"
+    default_data_root = ASB_SOURCE_ROOT if args.use_all else ASB_FIXTURE_ROOT
+    tasks_path = resolve_path(args.tasks) if args.tasks else default_data_root / "tasks.jsonl"
+    normal_tools_path = resolve_path(args.normal_tools) if args.normal_tools else default_data_root / "normal_tools.jsonl"
+    attack_tools_path = resolve_path(args.attack_tools) if args.attack_tools else default_data_root / "attack_tools.jsonl"
 
-    prefix = "all_" if args.use_all else ""
-    tasks_path = resolve_path(args.tasks) if args.tasks else examples_dir / f"{prefix}tasks.jsonl"
-    normal_tools_path = resolve_path(args.normal_tools) if args.normal_tools else examples_dir / f"{prefix}normal_tools.jsonl"
-    attack_tools_path = resolve_path(args.attack_tools) if args.attack_tools else examples_dir / f"{prefix}attack_tools.jsonl"
-
-    runner = BenchmarkRunner(
+    cases = build_asb_cases(
         tasks=load_tasks(tasks_path),
         normal_tools=load_normal_tools(normal_tools_path),
         attack_tools=load_attack_tools(attack_tools_path),
-    )
-
-    cases = runner.build_cases(
         attack_channels=parse_csv(args.channels, ATTACK_CHANNELS),
         attack_types=parse_csv(args.attack_types, ATTACK_TYPES),
     )

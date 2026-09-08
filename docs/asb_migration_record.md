@@ -124,18 +124,20 @@ Original ASB source snapshot:
     - `ASB-main/main_attacker.py`
     - `ASB-main/config/DPI.yml`
 
-Lightweight ASB adapter used inside this project:
+Offline ASB import support used inside this project:
 
-- `Benchmark/ASB/`
-  - Local ASB adapter and example data.
-  - Important files:
-    - `Benchmark/ASB/bench/schemas.py`: ASB task, normal tool, attack tool, and benchmark case models.
-    - `Benchmark/ASB/bench/io.py`: JSONL loading for ASB tasks/tools.
-    - `Benchmark/ASB/bench/runner.py`: ASB case construction and normal-tool inference.
-    - `Benchmark/ASB/bench/tools.py`: conversion of ASB normal/attack tools into callable tool schemas.
-    - `Benchmark/ASB/bench/injectors.py`: DPI/OPI/MP/POT injection construction.
-    - `Benchmark/ASB/bench/evaluator.py`: lightweight evaluation helpers.
-    - `Benchmark/ASB/examples/`: small and all example JSONL files used by the adapter.
+- `data/source_benchmarks/asb/`
+  - Retained full ASB source snapshot: tasks, normal tools, and attack tools.
+- `scripts/asb_import/`
+  - `models.py`: minimal ASB source and case models needed for conversion.
+  - `loaders.py`: JSONL loading for the compact and upstream-style ASB formats.
+  - `case_builder.py`: DPI/OPI/MP/POT case and attack-template construction.
+  - `import_asb_to_vesta.py`: conversion of ASB cases into VESTA seed instances.
+- `scripts/test/fixtures/asb/`
+  - Small source samples used only by importer regression tests.
+
+The former standalone adapter under `Benchmark/ASB/` was removed. VESTA runtime
+evaluation does not import the offline ASB conversion code.
 
 VESTA import script:
 
@@ -787,3 +789,48 @@ Additional prompt scan:
 
 - Existing results under `outputs/results` were produced before this cleanup and should be rerun before comparing safe/unsafe rates.
 - Tool names such as `PatientDataTheft` and `ConfidentialDocumentTheft` are still executable registry names. Hiding them from the target would require an alias layer that maps neutral visible names back to internal tool names.
+
+## 2026-09-08 ASB Importer Decoupling
+
+### Scope
+
+- Removed the standalone lightweight ASB execution package from `Benchmark/ASB`.
+- Kept the complete ASB source snapshot for reproducibility.
+- Preserved ASB case construction behavior used by the offline VESTA importer.
+- Confirmed that VESTA runtime evaluation has no dependency on the importer.
+
+### Files Moved or Added
+
+- Complete source snapshot: `data/source_benchmarks/asb/`
+  - `tasks.jsonl`: 10 source rows, expanded by the loader into 51 tasks.
+  - `normal_tools.jsonl`: 20 tools.
+  - `attack_tools.jsonl`: 400 tools.
+- Offline importer implementation: `scripts/asb_import/`
+  - `models.py`
+  - `loaders.py`
+  - `case_builder.py`
+  - `import_asb_to_vesta.py`
+- Small regression fixtures: `scripts/test/fixtures/asb/`.
+- Regression tests: `scripts/test/test_asb_import.py`.
+
+### Removed Components
+
+- Standalone ASB CLI and mock agent adapter.
+- Standalone ASB evaluator and result models.
+- Simulated ASB tool runtime.
+- The `Benchmark` Python package after all required import behavior was relocated.
+
+These components were not used by `scripts/run/run_dimension_eval.py`. The old CLI
+also imported a missing `Benchmark.mcp_safety` module and could not start.
+
+### Verification
+
+- Compared all 40 cases generated from the small fixture before and after the
+  refactor; serialized case structures were identical.
+- Ran `python -m unittest scripts.test.test_asb_import`: 3 tests passed.
+- Compiled all new importer modules with `python -m py_compile`.
+- Ran a one-case import from the complete source snapshot successfully.
+- Loaded the VESTA `input_perception_risk.instruction_injection` evaluation path
+  with `--limit 0` successfully.
+- Confirmed there are no executable `Benchmark` imports under `src`, `scripts`, or
+  `configs`.

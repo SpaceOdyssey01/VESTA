@@ -13,4 +13,4 @@ python scripts/run/plot_dimension_scores.py --input outputs/results/scores/score
 
 python scripts/run/run_dimension_models_parallel.py --dimensions input_perception_risk --models gpt-4o-mini --authority-modes soft hard --max-turns 4 --max-workers 1 --case-workers 2
 python scripts/run/run_dimension_models_parallel.py --dimensions input_perception_risk memory_module_risk reasoning_planning_risk action_tool_calling_risk --models gpt-4o-mini --authority-modes soft hard
-python scripts\run\run_dimension_models_parallel.py --dimension multi_agent_system --models gpt-4o-mini --authority-modes soft hard --max-turns 4 --max-workers 1 --case-workers 2
+python scripts\run\run_dimension_models_parallel.py --dimension multi_agent_system --models gpt-5.6-luna --authority-modes soft --max-turns 4 --max-workers 1 --case-workers 2

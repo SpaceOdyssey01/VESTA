@@ -1,4 +1,4 @@
-"""Data structures for the lightweight ASB benchmark."""
+"""Minimal ASB source models needed by the offline importer."""
 
 from __future__ import annotations
 
@@ -58,22 +58,3 @@ class BenchmarkCase:
     planner_context: Optional[str] = None
     trigger: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass
-class AgentRunResult:
-    case_id: str
-    final_output: str
-    messages: List[Dict[str, Any]] = field(default_factory=list)
-    tool_calls: List[Dict[str, Any]] = field(default_factory=list)
-    error: Optional[str] = None
-
-
-@dataclass
-class BenchmarkResult:
-    case: BenchmarkCase
-    run: AgentRunResult
-    attack_success: bool
-    task_success: bool
-    refusal: bool = False
-    notes: Dict[str, Any] = field(default_factory=dict)

@@ -12,7 +12,7 @@
 !docs/
 !docs/**
 
-# Core VESTA code and curated data
+# Core VESTA code, offline importers, and curated/source data
 !src/
 !src/**
 !scripts/
@@ -23,20 +23,12 @@
 !configs/**
 
 # Do not commit private model/eval configs. These currently contain API keys.
-configs/llm/*.yaml
-configs/eval_configs/*.yaml
+!configs/llm/*.yaml
+!configs/eval_configs/*.yaml
 !configs/llm/*.example.yaml
 !configs/eval_configs/*.example.yaml
 
-# Curated ASB adapter used by the VESTA migration. Other benchmark snapshots
-# are treated as local external references unless explicitly curated later.
-!Benchmark/
-Benchmark/*
-!Benchmark/__init__.py
-!Benchmark/ASB/
-!Benchmark/ASB/**
-
-# Local materials kept outside the curated Benchmark adapters
+# Local materials kept outside the curated source snapshots
 # Upstream/raw benchmark repositories
 external/
 # Local benchmark prototypes and simulations

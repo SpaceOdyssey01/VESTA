@@ -1,0 +1,4 @@
+﻿llm_type: "OpenAiChatLLM"
+base_url: "https://aihubmix.com/v1"
+api_key: "sk-Ru9PAd7djUonhjzI8d9bBb086d6a45148aA68fDdE92eA96d"
+model_name: "claude-opus-4-7"
