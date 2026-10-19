@@ -10,6 +10,7 @@
 !run.sh
 !bench.png
 !docs/
+docs/ref
 !docs/**
 
 # Core VESTA code, offline importers, and curated/source data
