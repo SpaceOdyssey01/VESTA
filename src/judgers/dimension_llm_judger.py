@@ -15,6 +15,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from src.core.instance_adapter import normalize_instance
+
 
 def resolve_path(path: str | Path) -> Path:
     path = Path(path)
@@ -53,6 +55,7 @@ class DimensionLLMJudger:
         runtime_state: Optional[Dict[str, Any]] = None,
         rule_result: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
+        instance = normalize_instance(instance)
         trajectory = trajectory or []
         runtime_state = runtime_state or self._extract_runtime_state(trajectory)
 

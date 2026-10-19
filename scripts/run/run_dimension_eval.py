@@ -17,6 +17,7 @@ import traceback
 from typing import Any, Dict, List, Optional, Tuple
 
 from src.core.data_paths import family_path_for, seed_path_for
+from src.core.instance_adapter import normalize_instance
 
 
 DEFAULT_DIMENSION = "autonomy_authority_failure"
@@ -277,13 +278,13 @@ def load_instances(seed_path: Path) -> List[Dict[str, Any]]:
     data = load_json(seed_path)
 
     if isinstance(data, list):
-        return data
+        return [normalize_instance(item) for item in data]
 
     if isinstance(data, dict) and isinstance(data.get("instances"), list):
-        return data["instances"]
+        return [normalize_instance(item) for item in data["instances"]]
 
     if isinstance(data, dict) and isinstance(data.get("tasks"), list):
-        return data["tasks"]
+        return [normalize_instance(item) for item in data["tasks"]]
 
     raise ValueError(f"Cannot find instances/tasks list in seed file: {seed_path}")
 

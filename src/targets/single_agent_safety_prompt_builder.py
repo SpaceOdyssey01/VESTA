@@ -3,6 +3,9 @@ from __future__ import annotations
 import json
 from typing import Any, Dict, List, Optional, Set
 
+from src.core.instance_adapter import normalize_instance
+from src.targets.visibility import PRIVATE_KEYS, target_context, target_environment, visible_tool_names
+
 
 class SingleAgentSafetyPromptBuilder:
     BASE_HIDDEN_KEYS: Set[str] = {
@@ -336,10 +339,12 @@ class SingleAgentSafetyPromptBuilder:
         attacker_messages: Optional[List[Dict[str, Any]]] = None,
         tool_observations: Optional[List[Dict[str, Any]]] = None
     ) -> List[Dict[str, str]]:
+        instance = normalize_instance(instance)
         attacker_messages = attacker_messages or []
         tool_observations = tool_observations or []
 
         hidden_keys = self._hidden_keys_for_instance(instance)
+        tool_aliases = visible_tool_names(tool_bundle.get("tool_specs", []))
 
         system_prompt = self._build_system_prompt()
         task_prompt = self._build_task_prompt(
@@ -373,6 +378,7 @@ class SingleAgentSafetyPromptBuilder:
                 tool_result=observation,
                 hidden_keys=hidden_keys
             )
+            visible_observation = self._alias_tool_names(visible_observation, tool_aliases)
             messages.append({
                 "role": "user",
                 "content": "Tool result:\n" + json.dumps(
@@ -424,15 +430,33 @@ Do not output extra text outside the JSON object.
         authority_mode: str,
         hidden_keys: Set[str]
     ) -> str:
-        target_spec = instance.get("target_spec", {})
+        target_spec = target_context(instance)
         environment_state = self._visible_environment_state(
-            environment_state=instance.get("environment_state", {}),
+            environment_state=target_environment(instance),
             hidden_keys=hidden_keys
         )
         tools = self._visible_tools(
             tool_specs=tool_bundle.get("tool_specs", []),
             hidden_keys=hidden_keys
         )
+        # Legacy generated specs often turn benchmark suffixes into descriptions.
+        # Prefer the source tool documentation over those generated labels.
+        if instance.get("source") in {"ASB_POT", "ASB_ACTION_TOOL_CALLING"}:
+            aliases = visible_tool_names(tool_bundle.get("tool_specs", []))
+            descriptions = {
+                aliases.get(role.get("preferred_tool_name")): role.get("description")
+                for role in instance.get("tool_manifest", {}).get("required_tool_roles", [])
+                if role.get("role") != "normal_task_tool"
+            }
+            normal_docs = {
+                item["tool_name"]: item.get("description")
+                for item in instance.get("environment_state", {}).get("normal_tool_outputs", [])
+                if isinstance(item, dict) and item.get("tool_name")
+            }
+            descriptions.update({aliases.get(name, name): desc for name, desc in normal_docs.items()})
+            for tool in tools:
+                if descriptions.get(tool.get("tool_name")):
+                    tool["description"] = descriptions[tool["tool_name"]]
 
         authority_context = self._select_authority_context(
             target_spec=target_spec,
@@ -491,10 +515,11 @@ Do not output extra text outside the JSON object.
         hidden_keys: Set[str]
     ) -> List[Dict[str, Any]]:
         visible = []
+        aliases = visible_tool_names(tool_specs)
 
         for tool in tool_specs:
             visible_tool = {
-                "tool_name": tool.get("target_visible_name") or tool.get("tool_name"),
+                "tool_name": aliases.get(tool.get("tool_name")),
                 "description": (
                     tool.get("target_visible_description")
                     or tool.get("description")
@@ -505,6 +530,13 @@ Do not output extra text outside the JSON object.
             visible.append(self._sanitize_for_target(visible_tool, hidden_keys))
 
         return visible
+
+    def _alias_tool_names(self, value: Any, aliases: Dict[str, str]) -> Any:
+        if isinstance(value, dict):
+            return {key: self._alias_tool_names(item, aliases) for key, item in value.items()}
+        if isinstance(value, list):
+            return [self._alias_tool_names(item, aliases) for item in value]
+        return aliases.get(value, value) if isinstance(value, str) else value
 
     def _sanitize_for_target(
         self,
@@ -517,7 +549,7 @@ Do not output extra text outside the JSON object.
                 for key, item in value.items()
                 if (
                     key not in hidden_keys
-                    and not key.startswith("hidden_")
+                    and not key.startswith(("hidden_", "unsafe_", "asb_", "risk_"))
                     and (sanitized_item := self._sanitize_for_target(item, hidden_keys)) not in [None, "", [], {}]
                 )
             }
@@ -532,7 +564,7 @@ Do not output extra text outside the JSON object.
         return value
 
     def _hidden_keys_for_instance(self, instance: Dict[str, Any]) -> Set[str]:
-        hidden_keys = set(self.BASE_HIDDEN_KEYS)
+        hidden_keys = set(self.BASE_HIDDEN_KEYS) | PRIVATE_KEYS
 
         dimension_id = self._get_dimension_id(instance)
         subtype_id = self._get_subtype_id(instance)

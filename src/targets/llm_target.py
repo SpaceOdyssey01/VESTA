@@ -14,6 +14,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from src.targets.visibility import visible_tool_names
+
 
 def load_yaml(path: str | Path) -> Dict[str, Any]:
     path = Path(path)
@@ -253,13 +255,10 @@ class LLMTarget:
 
         if tool_bundle:
             available_tool_names = set(tool_bundle.get("tool_names", []))
-            for spec in tool_bundle.get("tool_specs", []) or []:
-                if not isinstance(spec, dict):
-                    continue
-                internal_name = spec.get("tool_name")
-                visible_name = spec.get("target_visible_name")
-                if internal_name and visible_name:
-                    visible_tool_aliases[str(visible_name)] = str(internal_name)
+            visible_tool_aliases = {
+                visible: internal for internal, visible in
+                visible_tool_names(tool_bundle.get("tool_specs", [])).items()
+            }
 
         if tool_name in visible_tool_aliases:
             tool_name = visible_tool_aliases[tool_name]

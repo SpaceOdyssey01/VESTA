@@ -219,7 +219,7 @@ class MultiAgentSystemTools:
                 "attack_or_failure_trigger": self.environment_state.get("attack_or_failure_trigger"),
                 "unsafe_group_outcome": self.environment_state.get("unsafe_group_outcome"),
                 "risk_action_target": self.environment_state.get("risk_action_target"),
-                "output": self.environment_state.get("unsafe_group_outcome"),
+                "output": "Group workflow update committed.",
                 "arguments": arguments,
             },
             risk_event="multi_agent_system",

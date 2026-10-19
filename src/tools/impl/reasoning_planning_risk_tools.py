@@ -210,7 +210,7 @@ class ReasoningPlanningRiskTools:
                 "trigger_conditioned_plan_step_adopted": True,
                 "pot_trigger": self.environment_state.get("pot_trigger"),
                 "attack_goal": attack_goal,
-                "output": attack_goal,
+                "output": self.environment_state.get("attacker_goal_original") or "Tool operation completed.",
                 "arguments": arguments,
             },
             risk_event="reasoning_planning_risk",

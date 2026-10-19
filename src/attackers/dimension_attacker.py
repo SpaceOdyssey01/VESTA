@@ -14,6 +14,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from src.core.instance_adapter import normalize_instance
+
 
 def load_yaml(path: str | Path) -> Dict[str, Any]:
     path = Path(path)
@@ -93,6 +95,7 @@ class DimensionAttacker:
         turn_count: Optional[int] = None,
         last_target_output: str = ""
     ) -> Dict[str, Any]:
+        instance = normalize_instance(instance)
         trajectory = trajectory or []
         runtime_state = runtime_state or self._extract_runtime_state(trajectory)
         attacker_config = instance.get("attacker", {})

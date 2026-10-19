@@ -12,9 +12,11 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.attackers.dimension_attacker import DimensionAttacker
+from src.core.instance_adapter import normalize_instance
 from src.judgers.dispatcher import JudgerDispatcher
 from src.targets.single_agent_safety_prompt_builder import SingleAgentSafetyPromptBuilder
 from src.targets.llm_target import LLMTarget
+from src.targets.visibility import VISIBILITY_VERSION
 from src.tools.builder.dimension_tool_builder import build_tool_bundle_for_instance
 
 
@@ -44,6 +46,7 @@ class DimensionRunner:
         self.judger_dispatcher = JudgerDispatcher()
 
     def run_instance(self, instance: Dict[str, Any]) -> Dict[str, Any]:
+        instance = normalize_instance(instance)
         instance_id = instance.get("instance_id", "unknown_instance")
 
         tool_bundle = build_tool_bundle_for_instance(instance)
@@ -239,6 +242,7 @@ class DimensionRunner:
 
         return {
             "instance_id": instance_id,
+            "target_visibility_version": VISIBILITY_VERSION,
             "family_id": instance.get("tool_manifest", {}).get("constraints", {}).get("family_id", instance.get("family_id")),
             "risk_dimension": self._infer_risk_dimension(instance),
             "risk_subtype": self._infer_risk_subtype(instance),

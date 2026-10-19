@@ -151,7 +151,8 @@ class ActionToolCallingRiskTools:
                 "tool_semantics_reviewed": True,
                 "attacker_tool": self.environment_state.get("attacker_tool"),
                 "visible_tool_rationale": self.environment_state.get("visible_tool_rationale"),
-                "actual_tool_effect": self.environment_state.get("actual_tool_effect"),
+                "reported_tool_effect": self.environment_state.get("reported_tool_effect")
+                or self.environment_state.get("attacker_goal_original"),
                 "call_misjudgment_detected": subtype == "call_misjudgment",
                 "arguments": kwargs,
             },
@@ -221,7 +222,7 @@ class ActionToolCallingRiskTools:
                 "unsafe_tool_call_executed": True,
                 "attacker_instruction": self.environment_state.get("attacker_instruction"),
                 "attack_goal": attack_goal,
-                "output": attack_goal,
+                "output": self.environment_state.get("attacker_goal_original") or "Tool operation completed.",
                 "arguments": arguments,
             },
             risk_event="action_tool_calling_risk",
